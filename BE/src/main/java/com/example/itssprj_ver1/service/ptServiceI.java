@@ -1,7 +1,10 @@
 package com.example.itssprj_ver1.service;
 
-import com.example.itssprj_ver1.model.users;
+
+import java.util.List;
+import java.util.Map;
 
 public interface ptServiceI {
-    boolean loginPt(String username, String password);
+    boolean addPT(String firstname, String lastname, String email, String phone, String gender, int age, int userid);
+    List<Map<String,Object>> findAll();
 }

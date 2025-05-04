@@ -2,8 +2,14 @@ package com.example.itssprj_ver1.service;
 
 import com.example.itssprj_ver1.model.customer;
 
-public interface customerServiceI {
-    boolean loginCustomer(String username, String password);
+import java.util.List;
+import java.util.Map;
 
-    boolean addCustomer(String firstname, String lastname, int age, String email, String gender, String username, String phone);
+public interface customerServiceI {
+
+    boolean addCustomer(String firstname, String lastname, String email, String phone, String gender, int age, int userid);
+
+    List<Map<String, Object>> getAllCustomers();
+
+    boolean updateCustomer(int customerid, String firstname, String lastname, String email, String phone, int age);
 }

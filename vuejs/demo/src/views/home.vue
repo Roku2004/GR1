@@ -9,29 +9,34 @@ const goToLogin = () => {
   router.push('/login');
 };
 
-const goToPrice =() => {
-  router.push('/price');
-  }
 // Hàm cuộn mượt đến Footer
 const scrollToFooter = () => {
   const footer = document.getElementById('footer');
   if (footer) {
     footer.scrollIntoView({ behavior: 'smooth' });
   }
+};
 
+// Hàm cuộn mượt đến bảng giá
+const scrollToPrice = () => {
+  const pricingSection = document.getElementById('pricing');
+  if (pricingSection) {
+    pricingSection.scrollIntoView({ behavior: 'smooth' });
+  }
 };
 </script>
+
 <template>
   <div class="home-page">
     <!-- Header -->
     <header class="header">
       <div class="logo">
-        <h1>FitLife Gym</h1>
+        <h1>PIG GYM</h1>
       </div>
       <nav class="nav">
         <ul>
           <li><a href="#">Trang chủ</a></li>
-          <li><a @click="goToPrice">Bảng giá</a></li>
+          <li><a @click.prevent="scrollToPrice">Gói tập</a></li>
           <li><a @click.prevent="scrollToFooter" href="#contact">Liên hệ</a></li>
         </ul>
       </nav>
@@ -44,14 +49,13 @@ const scrollToFooter = () => {
     <section class="hero">
       <div class="hero-content">
         <h1>Biến đổi cơ thể, nâng tầm cuộc sống</h1>
-        <p>Tham gia FitLife Gym ngay hôm nay để chinh phục mục tiêu sức khỏe của bạn!</p>
-        <button @click="goToLogin" class="btn cta">Bắt đầu ngay</button>
+        <p>Tham gia PIG GYM ngay hôm nay để chinh phục mục tiêu sức khỏe của bạn!</p>
       </div>
     </section>
 
     <!-- Features Section -->
     <section class="features">
-      <h2>Tại sao chọn FitLife Gym?</h2>
+      <h2>Tại sao chọn PIG GYM?</h2>
       <div class="features-grid">
         <div class="feature-item">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -79,19 +83,90 @@ const scrollToFooter = () => {
       </div>
     </section>
 
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing-section">
+      <div class="container">
+        <header>
+          <h1>BẢNG GIÁ THÀNH VIÊN</h1>
+          <p class="subtitle">Lựa chọn gói tập phù hợp với nhu cầu của bạn</p>
+        </header>
+        
+        <div class="pricing-table">
+          <!-- Gói cơ bản -->
+          <div class="pricing-card">
+            <div class="pricing-header">
+              <h2 class="pricing-title">GÓI CƠ BẢN</h2>
+              <div class="pricing-price">1.200.000<sup>đ</sup></div>
+              <div class="pricing-period">/ tháng</div>
+            </div>
+            <div class="pricing-features">
+              <ul>
+                <li><span class="feature-icon">✓</span> Tập luyện không giới hạn</li>
+                <li><span class="feature-icon">✓</span> Sử dụng máy tập cơ bản</li>
+                <li><span class="feature-icon">✓</span> Hướng dẫn an toàn ban đầu</li>
+                <li><span class="feature-icon">✓</span> Wifi miễn phí</li>
+                <li><span class="feature-icon">✓</span> Khăn tắm miễn phí</li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Gói tiêu chuẩn (nổi bật) -->
+          <div class="pricing-card highlight">
+            <div class="highlight-label">PHỔ BIẾN</div>
+            <div class="pricing-header">
+              <h2 class="pricing-title">GÓI TIÊU CHUẨN</h2>
+              <div class="pricing-price">2.500.000<sup>đ</sup></div>
+              <div class="pricing-period">/ 3 tháng</div>
+            </div>
+            <div class="pricing-features">
+              <ul>
+                <li><span class="feature-icon">✓</span> Tất cả ưu đãi gói cơ bản</li>
+                <li><span class="feature-icon">✓</span> Sử dụng toàn bộ máy tập</li>
+                <li><span class="feature-icon">✓</span> 2 buổi PT miễn phí</li>
+                <li><span class="feature-icon">✓</span> Đánh giá thể chất định kỳ</li>
+                <li><span class="feature-icon">✓</span> Miễn phí phòng xông hơi</li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Gói cao cấp -->
+          <div class="pricing-card">
+            <div class="pricing-header">
+              <h2 class="pricing-title">GÓI CAO CẤP</h2>
+              <div class="pricing-price">8.000.000<sup>đ</sup></div>
+              <div class="pricing-period">/ 12 tháng</div>
+            </div>
+            <div class="pricing-features">
+              <ul>
+                <li><span class="feature-icon">✓</span> Tất cả ưu đãi gói tiêu chuẩn</li>
+                <li><span class="feature-icon">✓</span> 8 buổi PT cá nhân</li>
+                <li><span class="feature-icon">✓</span> Chế độ dinh dưỡng riêng</li>
+                <li><span class="feature-icon">✓</span> Miễn phí khóa học nhóm</li>
+                <li><span class="feature-icon">✓</span> Ưu đãi 20% dịch vụ spa</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class="note">
+          <p>* Giá trên chưa bao gồm VAT. Áp dụng từ ngày 01/04/2025.</p>
+          <p>Liên hệ hotline: 1900 1234 để được tư vấn thêm.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- Footer -->
     <footer id="footer" class="footer">
-      <p>FitLife Gym - Sức khỏe là vàng</p>
+      <p>PIG GYM - Sức khỏe là vàng</p>
       <div class="social-links">
-        <a href="#"><img width="50" height="50" src="https://img.icons8.com/ios-filled/50/facebook-new.png" alt="facebook-new"/></a>
-        <a href="#"><img width="60" height="60" src="https://img.icons8.com/ios-glyphs/60/instagram-new.png" alt="instagram-new" /></a>
-        <a href="#"><img width="50" height="50" src="https://img.icons8.com/ios-filled/50/tiktok--v1.png" alt="tiktok--v1" /></a>
+        <a href="https://www.facebook.com/piggym2020?fbclid=PAZXh0bgNhZW0CMTEAAaeLF-VPJjRJHRrSM_f-PZ1N-2EpwKyRttZmYXP5C9XtJ0jzrEulvp07n-3SCg_aem_Dep9AZ1Z44BbeVQ2HzAUew"><img width="50" height="50" src="https://img.icons8.com/ios-filled/50/facebook-new.png" alt="facebook-new"/></a>
+        <a href="https://www.instagram.com/piggym.2020/"><img width="60" height="60" src="https://img.icons8.com/ios-glyphs/60/instagram-new.png" alt="instagram-new" /></a>
+        <a href="https://www.tiktok.com/@piggym2020"><img width="50" height="50" src="https://img.icons8.com/ios-filled/50/tiktok--v1.png" alt="tiktok--v1" /></a>
       </div>
-      <p>Liên hệ: info@fitlifegym.com | 0123 456 789</p>
+      <p>Liên hệ: cskh.piggymdn@gmail.com | 085 966 3468</p>
     </footer>
   </div>
 </template>
-
 
 <style scoped>
 /* Nhúng Google Fonts */
@@ -102,7 +177,7 @@ const scrollToFooter = () => {
   font-family: 'Poppins', sans-serif;
   color: #333;
   overflow-x: hidden;
-  scroll-behavior: smooth; /* Cuộn mượt toàn trang */
+  scroll-behavior: smooth;
 }
 
 /* Header */
@@ -322,6 +397,151 @@ const scrollToFooter = () => {
   color: #555;
 }
 
+/* Pricing Section */
+.pricing-section {
+  padding: 6rem 0;
+  background: linear-gradient(180deg, #ffffff, #f5f5f5);
+  text-align: center;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.pricing-section h1 {
+  font-family: 'Roboto', sans-serif;
+  color: #2c3e50;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: #e74c3c;
+  font-size: 1.2rem;
+  font-weight: 300;
+  margin-bottom: 40px;
+}
+
+.pricing-table {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.pricing-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.pricing-card:hover {
+  transform: translateY(-10px);
+}
+
+.pricing-header {
+  background: #2c3e50;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.pricing-title {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.pricing-price {
+  font-size: 2.5rem;
+  margin: 15px 0;
+  font-weight: bold;
+}
+
+.pricing-period {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.pricing-features {
+  padding: 20px;
+}
+
+.pricing-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pricing-features li {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+}
+
+.pricing-features li:last-child {
+  border-bottom: none;
+}
+
+.feature-icon {
+  color: #f39c12;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.pricing-footer {
+  padding: 20px;
+  text-align: center;
+}
+
+.pricing-footer .btn {
+  display: inline-block;
+  background: #e74c3c;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.pricing-footer .btn:hover {
+  background: #c0392b;
+}
+
+.highlight {
+  border: 2px solid #f39c12;
+  position: relative;
+}
+
+.highlight-label {
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  background: #f39c12;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.note {
+  text-align: center;
+  margin-top: 30px;
+  font-style: italic;
+  color: #7f8c8d;
+}
+
 /* Footer */
 .footer {
   background-color: #fff;
@@ -392,6 +612,11 @@ const scrollToFooter = () => {
     font-size: 2.2rem;
   }
 
+  .pricing-table {
+    flex-direction: column;
+    align-items: center;
+  }
+
   .footer {
     padding: 3rem 1.5rem;
   }
@@ -425,6 +650,11 @@ const scrollToFooter = () => {
   .feature-item .icon {
     width: 60px;
     height: 60px;
+  }
+
+  .pricing-card {
+    width: 100%;
+    max-width: 300px;
   }
 }
 </style>
