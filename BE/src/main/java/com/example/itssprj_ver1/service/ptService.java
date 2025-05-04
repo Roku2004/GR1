@@ -50,11 +50,15 @@ public class ptService implements ptServiceI {
         List<Map<String, Object>> staffMap = new ArrayList<>();
         for (staff staff : staffs) {
             Map<String, Object> map = new HashMap<>();
-            map.put("name", staff.getFirstname() + staff.getLastname());
-            map.put("email", staff.getEmail());
-            map.put("phone", staff.getPhone());
-            map.put("rank", staff.getRank());
-            staffMap.add(map);
+            if(staff.getUserid().isDeleted() == false && staff.getUserid().getRole().getRoleid() == 3) {
+                map.put("name", staff.getFirstname() + " " + staff.getLastname());
+                map.put("email", staff.getEmail());
+                map.put("phone", staff.getPhone());
+                map.put("rank", staff.getRank());
+                staffMap.add(map);
+            } else {
+                continue;
+            }
         }
         return staffMap;
     }

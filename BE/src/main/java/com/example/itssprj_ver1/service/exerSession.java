@@ -72,22 +72,26 @@ public class exerSession implements exerSessionI {
         if (staff == null) {
             return false; // Không tìm thấy huấn luyện viên
         }
-        try {
-
-            // Tạo đối tượng exerciseSession sử dụng builder pattern
-            exerciseSession session = exerciseSession.builder()
-                    .customer(customer)
-                    .staff(staff)
-                    .ExerciseType(exerciseType)
-                    .build();
-
-            // Lưu buổi tập vào database
-            exerSessionRepository.save(session);
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(customer.getUserid().isDeleted() == true && staff.getUserid().isDeleted() == true){
             return false;
+        } else {
+            try {
+
+                // Tạo đối tượng exerciseSession sử dụng builder pattern
+                exerciseSession session = exerciseSession.builder()
+                        .customer(customer)
+                        .staff(staff)
+                        .ExerciseType(exerciseType)
+                        .build();
+
+                // Lưu buổi tập vào database
+                exerSessionRepository.save(session);
+
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
         }
     }
 
