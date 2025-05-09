@@ -448,10 +448,10 @@ public class managerController {
 
             // Gọi service để thêm member register
             if (memRegService.updateMemberReg(memberRegId, status, beginAt, endAt)) {
-                response.put("status", "Gia hạn gói tập cho khách thành công");
+                response.put("status", "Sửa thông tin đăng ký gói tập thành công");
                 return ResponseEntity.ok(response);
             } else {
-                response.put("status", "Gia hạn gói tập cho khách không thành công");
+                response.put("status", "Sửa thông tin đăng ký gói tập không thành công");
                 return ResponseEntity.status(400).body(response);
             }
         } catch (Exception e) {

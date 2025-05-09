@@ -68,20 +68,37 @@ public class customerService implements customerServiceI {
 
     @Override
     public boolean updateCustomer(int customerid, String firstname, String lastname, String email, String phone, int age) {
-        Optional<customer> customer = customerRepository.findById(customerid);
-        if (customer.isEmpty()) {
+        customer customer = customerRepository.findById(customerid);
+        if (customer == null) {
             return false;
         }
         try {
-            customer.get().setFirstname(firstname);
-            customer.get().setLastname(lastname);
-            customer.get().setEmail(email);
-            customer.get().setPhone(phone);
-            customer.get().setAge(age);
-            customerRepository.save(customer.get());
+            customer.setFirstname(firstname);
+            customer.setLastname(lastname);
+            customer.setEmail(email);
+            customer.setPhone(phone);
+            customer.setAge(age);
+            customerRepository.save(customer);
             return true;
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public List<Map<String, Object>> infoCustomer(int customerid) {
+        customer customer = customerRepository.findById(customerid);
+        Map<String, Object> response = new HashMap<>();
+        if (customer == null) {
+            return null;
+        }
+        response.put("name" , customer.getFirstname() + " " + customer.getLastname());
+        response.put("phone" , customer.getPhone());
+        response.put("email" , customer.getEmail());
+        response.put("age" , customer.getAge());
+        response.put("gender" , customer.getGender());
+        List<Map<String, Object>> mappedResults = new ArrayList<>();
+        mappedResults.add(response);
+        return mappedResults;
     }
 }

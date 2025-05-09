@@ -12,4 +12,6 @@ public interface customerServiceI {
     List<Map<String, Object>> getAllCustomers();
 
     boolean updateCustomer(int customerid, String firstname, String lastname, String email, String phone, int age);
+
+    List<Map<String, Object>> infoCustomer(int customerid);
 }

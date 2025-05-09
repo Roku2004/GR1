@@ -62,6 +62,42 @@ public class exerSession implements exerSessionI {
     }
 
     @Override
+    public List<Map<String, Object>> getAllSession(int customerId) {
+        List<exerciseSession> sessions = exerSessionRepository.findByCustomer_Id(customerId);
+        if (sessions == null || sessions.isEmpty()) {
+            return null;
+        }
+        List<Map<String, Object>> sessionsList = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        for ( exerciseSession session : sessions) {
+            Map<String, Object> sessionMap = new HashMap<>();
+            sessionMap.put("sessionid", session.getId());
+
+            // Thông tin khách hàng
+            sessionMap.put("customer_name", session.getCustomer().getFirstname() + " " +
+                    session.getCustomer().getLastname());
+
+            // Thông tin huấn luyện viên
+            sessionMap.put("trainer_name", session.getStaff().getFirstname() + " " +
+                    session.getStaff().getLastname());
+
+            // Thời gian
+            LocalDateTime beginAt = session.getBeginAt();
+            LocalDateTime endAt = session.getEndAt();
+
+            sessionMap.put("begin_time", beginAt != null ? beginAt.format(formatter) : "Chưa xác định");
+            sessionMap.put("end_time", endAt != null ? endAt.format(formatter) : "Chưa xác định");
+
+            // Loại và mô tả
+            sessionMap.put("exercise_type", session.getExerciseType());
+            sessionMap.put("description", session.getDescription() != null ? session.getDescription() : "Chưa xác định");
+
+            sessionsList.add(sessionMap);
+        }
+        return sessionsList;
+    }
+
+    @Override
     public boolean addSession(String cufirstname, String culastname, String ptfirstname, String ptlastname,String exerciseType) {
         customer customer = customerRepository.findByFirstnameAndLastname(cufirstname, culastname);
         if (customer == null) {
@@ -114,7 +150,6 @@ public class exerSession implements exerSessionI {
             session.setCustomer(customer);
             session.setStaff(staff);
             session.setExerciseType(exerciseType);
-
             // Lưu buổi tập vào database
             exerSessionRepository.save(session);
 

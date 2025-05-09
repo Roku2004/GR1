@@ -5,6 +5,7 @@ import java.util.Map;
 
 public interface exerSessionI {
     List<Map<String,Object>> getAllSessions();
+    List<Map<String,Object>> getAllSession(int customerId);
     boolean addSession(String cufirstname,String culastname, String ptfirstname,String ptlastname, String exerciseType);
     boolean updateSession(int sessionid,String cufirstname, String culastname, String ptfirstname, String ptlastname, String exerciseType);
 }

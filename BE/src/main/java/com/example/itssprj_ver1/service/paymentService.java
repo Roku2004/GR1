@@ -8,6 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class paymentService implements paymentServiceI {
@@ -35,5 +39,24 @@ public class paymentService implements paymentServiceI {
         catch (Exception e){
             return false; // Error occurred while adding payment
         }
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllPayment(int customerId) {
+        List<payment> payments = paymentRepository.findByCustomer_Id(customerId);
+        if (payments == null || payments.isEmpty()) {
+            return null; // No payments found
+        }
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        for (payment payment : payments) {
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", payment.getId());
+            map.put("method", payment.getMethod());
+            map.put("amount", payment.getAmount());
+            map.put("paid", payment.getPaid());
+            map.put("createAt", payment.getCreateAt());
+            mapList.add(map);
+        }
+        return mapList;
     }
 }

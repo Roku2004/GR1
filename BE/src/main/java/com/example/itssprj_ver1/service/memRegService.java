@@ -68,7 +68,6 @@ public class memRegService implements memRegServiceI {
     @Override
     public boolean updateMemberReg(int memberRegId, String status, Date beginAt, Date endAt) {
         try {
-            // Find existing memberRegister by ID
             memberRegister existingMemberReg = memRegRepository.findById(memberRegId).orElse(null);
             if (existingMemberReg == null) {
                 return false; // Member register not found
@@ -78,8 +77,8 @@ public class memRegService implements memRegServiceI {
             existingMemberReg.setStatus(status);
             existingMemberReg.setBeginAt(beginAt);
             existingMemberReg.setEndAt(endAt);
+            existingMemberReg.setCreateAt(new Date( System.currentTimeMillis()));
 
-            // Save updated memberRegister to database
             memRegRepository.save(existingMemberReg);
 
             return true;
@@ -168,6 +167,27 @@ public class memRegService implements memRegServiceI {
             e.printStackTrace(); // Log error for debugging
             return null;
         }
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllMemberRegByCustomer(int customerId) {
+        List<memberRegister> allMemberRegs = memRegRepository.findAllByCustomer_Id(customerId);
+        if(allMemberRegs == null || allMemberRegs.isEmpty()) {
+            return null;
+        }
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        for(memberRegister memReg : allMemberRegs) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", memReg.getId());
+            map.put("customerName", memReg.getCustomer().getFirstname() + " " + memReg.getCustomer().getLastname());
+            map.put("membershipName", memReg.getMembership().getName());
+            map.put("status", memReg.getStatus());
+            map.put("createAt", memReg.getCreateAt());
+            map.put("beginAt", memReg.getBeginAt());
+            map.put("endAt", memReg.getEndAt());
+            mapList.add(map);
+        }
+        return mapList;
     }
 
     @Override
