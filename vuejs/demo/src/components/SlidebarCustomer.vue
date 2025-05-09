@@ -29,14 +29,12 @@ const goToHome = () => {
 };
 
 const menuItems = ref([
-  { id: 'dashboard', text: 'Tổng quan', icon: 'fas fa-home', route: '/managerHome' },
-  { id: 'members', text: 'Thành viên', icon: 'fas fa-users', route: '/members' },
-  { id: 'ptlist' , text: 'Danh sách huấn luyện viên', icon: 'fas fa-user-tie', route: '/ptlist' },
+  { id: 'dashboard', text: 'Tổng quan', icon: 'fas fa-home', route: '/customerHome' },
+  { id: 'infocustomer', text: 'Thông tin cá nhân', icon: 'fas fa-users', route: '/infocustomer' },
   { id: 'classes', text: 'Lớp tập', icon: 'fas fa-dumbbell', route: '/classes' },
-  { id: 'extend', text: 'Gia hạn gói tập', icon: 'fas fa-user-tie', route: '/extend' },
-  { id: 'room', text: 'Thiết bị phòng tập', icon: 'fas fa-cog', route: '/room' },
+  { id: 'extend', text: 'Thông tin gói tập', icon: 'fas fa-user-tie', route: '/extend' },
   { id: 'review', text: 'Đánh giá của khách hàng', icon: 'fas fa-cog', route: '/review' },
-  { id: 'payment', text: 'Thanh toán', icon: 'fas fa-credit-card', route: '/payment' }
+  { id: 'payment', text: 'Thông tin thanh toán', icon: 'fas fa-credit-card', route: '/payment' }
 ]);
 </script>
 

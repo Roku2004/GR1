@@ -1,7 +1,7 @@
 <script setup>
 import Slidebar from '@/components/SlidebarManager.vue'; // Import Slidebar component
-import { onMounted, ref } from 'vue';
 import axios from 'axios';
+import { onMounted, ref } from 'vue';
 
 const activeMenu = ref('extend');
 const API_BASE_URL = 'http://localhost:3001/manager'; // Base URL for API
@@ -316,7 +316,7 @@ const updateExtend = async () => {
     const response = await axios.post(
       `${API_BASE_URL}/updateMemberRegister`,
       {
-        id: editingItem.value.id,
+        memberRegId: editingItem.value.id,
         status: editingItem.value.status,
         beginAt: editingItem.value.beginAt,
         endAt: editingItem.value.endAt
@@ -326,8 +326,8 @@ const updateExtend = async () => {
       }
     );
 
-    if (response.data && response.data.status === "Cập nhật gia hạn thành công") {
-      showMessage('Cập nhật thành công!', 'success');
+    if (response.data && response.data.status === "Sửa thông tin đăng ký gói tập thành công") {
+      showMessage('Sửa thông tin đăng ký gói tập thành công!', 'success');
       fetchExtendList();
 
       showEditModal.value = false;
