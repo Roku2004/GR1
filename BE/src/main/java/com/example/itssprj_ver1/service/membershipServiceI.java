@@ -5,4 +5,6 @@ import java.util.Map;
 
 public interface membershipServiceI {
     List<Map<String, Object>> getMembership();
+
+    List<Map<String, Object>> getMembership(int userId);
 }

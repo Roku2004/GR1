@@ -8,9 +8,11 @@ import java.util.List;
 
 @Repository
 public interface staffRepository extends JpaRepository<staff, Integer> {
-    staff findByFirstnameAndLastname(String ptfirstname, String ptlastname);
+    staff findByUserid_Id(int useridId);
 
-    List<staff> findByUserid_Id(Integer useridId);
+    staff findById(int id);
 
     staff findStaffByUserid_Id(Integer id);
+
+    staff findByFirstnameAndLastname(String ptfirstname, String ptlastname);
 }

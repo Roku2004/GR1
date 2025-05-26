@@ -20,8 +20,8 @@ public class ptService implements ptServiceI {
 
     @Override
     public boolean addPT(String firstname, String lastname, String email, String phone, String gender, int age, int userid) {
-        Optional<users> user = userRepository.findById(userid);
-        if (user.isEmpty()) {
+        users user = userRepository.findById(userid);
+        if (user == null) {
             return false;
         }
         staff staff = new staff();
@@ -32,7 +32,7 @@ public class ptService implements ptServiceI {
         staff.setGender(gender);
         staff.setAge(age);
         staff.setRank("Iron");
-        staff.setUserid(user.get());
+        staff.setUserid(user);
         try{
             staffRepository.save(staff);
             return true;
@@ -42,8 +42,14 @@ public class ptService implements ptServiceI {
     }
 
     @Override
+    public staff getPTById(int id) {
+        staff staff = staffRepository.findByUserid_Id(id);
+            return staff;
+    }
+
+    @Override
     public List<Map<String, Object>> findAll() {
-        List<staff> staffs = staffRepository.findByUserid_Id(3);
+        List<staff> staffs = staffRepository.findAll();
         if (staffs == null || staffs.isEmpty()) {
             return null;
         }
@@ -51,6 +57,7 @@ public class ptService implements ptServiceI {
         for (staff staff : staffs) {
             Map<String, Object> map = new HashMap<>();
             if(staff.getUserid().isDeleted() == false && staff.getUserid().getRole().getRoleid() == 3) {
+                map.put("id", staff.getId());
                 map.put("name", staff.getFirstname() + " " + staff.getLastname());
                 map.put("email", staff.getEmail());
                 map.put("phone", staff.getPhone());

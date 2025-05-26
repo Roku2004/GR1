@@ -267,13 +267,11 @@ public class managerController {
             }
 
             // Kiểm tra các trường bắt buộc
-            String cufirstname = request.get("cufirstname");
-            String culastname = request.get("culastname");
-            String ptfirstname = request.get("ptfirstname");
-            String ptlastname = request.get("ptlastname");
+            int customerid = Integer.parseInt(request.get("customerid"));
+            int ptid = Integer.parseInt(request.get("ptid"));
             String exerciseType = request.get("exerciseType");
 
-            if (exerSession.addSession(cufirstname, culastname, ptfirstname, ptlastname, exerciseType)) {
+            if (exerSession.addSession(customerid, ptid, exerciseType)) {
                 response.put("status", "Thêm buổi tập thành công");
                 return ResponseEntity.ok(response);
             } else {
@@ -287,8 +285,8 @@ public class managerController {
     }
 
     @PostMapping("/updateExercise")
-    public ResponseEntity<Map<String, Object>> updateExerciseExerciseSession(@RequestHeader(value = "token", required = false) String token,
-                                                                             @RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> updateExerciseSession(@RequestHeader(value = "token", required = false) String token,
+                                                                     @RequestBody Map<String, String> request) {
         Map<String, Object> response = new HashMap<>();
         try {
             // Kiểm tra token
@@ -335,13 +333,12 @@ public class managerController {
                 response.put("message", "Token is missing or invalid");
                 return ResponseEntity.badRequest().body(response);
             }
-            String cufirstname = request.get("cufirstname");
-            String culastname = request.get("culastname");
+            String phone = request.get("phone");
             String paymentMethod = request.get("paymentMethod");
             Float amount = Float.parseFloat(request.get("amount"));
             Boolean paid = Boolean.parseBoolean(request.get("paid"));
 
-            if (paymentService.addPayment(cufirstname, culastname, paymentMethod, amount, paid)) {
+            if (paymentService.addPayment(phone, paymentMethod, amount, paid)) {
                 response.put("status", "Thêm thanh toán thành công");
                 return ResponseEntity.ok(response);
             } else {
@@ -369,8 +366,7 @@ public class managerController {
             }
 
             // Lấy thông tin từ request
-            String cufirstname = request.get("cufirstname");
-            String culastname = request.get("culastname");
+            String phone = request.get("phone");
             String namepackage = request.get("namepackage");
             String status = request.get("status");
 
@@ -380,26 +376,19 @@ public class managerController {
             try {
                 if (request.containsKey("beginAt") && !request.get("beginAt").isEmpty()) {
                     String beginAtStr = request.get("beginAt");
-                    // Nếu cần chuyển đổi định dạng từ dd/MM/yyyy sang yyyy-MM-dd
-                    SimpleDateFormat inputFormat = new SimpleDateFormat("dd-MM-yyyy");
-                    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    java.util.Date parsedDate = inputFormat.parse(beginAtStr);
-                    beginAt = Date.valueOf(outputFormat.format(parsedDate));
+                    beginAt = Date.valueOf(beginAtStr);
                 }
                 if (request.containsKey("endAt") && !request.get("endAt").isEmpty()) {
-                    // Tương tự cho endAt
+
                     String endAtStr = request.get("endAt");
-                    SimpleDateFormat inputFormat = new SimpleDateFormat("dd-MM-yyyy");
-                    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    java.util.Date parsedDate = inputFormat.parse(endAtStr);
-                    endAt = Date.valueOf(outputFormat.format(parsedDate));
+                    endAt = Date.valueOf(endAtStr);
                 }
             } catch (Exception e) {
                 throw new IllegalArgumentException("Định dạng ngày tháng không hợp lệ: " + e.getMessage());
             }
 
             // Gọi service để thêm member register
-            if (memRegService.addMemberReg(cufirstname, culastname, namepackage, status, beginAt, endAt)) {
+            if (memRegService.addMemberReg(phone, namepackage, status, beginAt, endAt)) {
                 response.put("status", "Đăng ký gói tập thành công");
                 return ResponseEntity.ok(response);
             } else {
@@ -445,14 +434,22 @@ public class managerController {
             } catch (Exception e) {
                 throw new IllegalArgumentException("Định dạng ngày tháng không hợp lệ: " + e.getMessage());
             }
-
-            // Gọi service để thêm member register
-            if (memRegService.updateMemberReg(memberRegId, status, beginAt, endAt)) {
-                response.put("status", "Sửa thông tin đăng ký gói tập thành công");
-                return ResponseEntity.ok(response);
+            if (beginAt != null && endAt != null && beginAt.after(endAt)) {
+                if (memRegService.updateMemberReg(memberRegId, status, beginAt, endAt)) {
+                    response.put("status", "Sửa thông tin đăng ký gói tập thành công");
+                    return ResponseEntity.ok(response);
+                } else {
+                    response.put("status", "Sửa thông tin đăng ký gói tập không thành công");
+                    return ResponseEntity.status(400).body(response);
+                }
             } else {
-                response.put("status", "Sửa thông tin đăng ký gói tập không thành công");
-                return ResponseEntity.status(400).body(response);
+                if (memRegService.deleteMemberReg(memberRegId, status)) {
+                    response.put("status", "Xóa thông tin đăng ký gói tập thành công");
+                    return ResponseEntity.ok(response);
+                } else {
+                    response.put("status", "Xóa thông tin đăng ký gói tập không thành công");
+                    return ResponseEntity.status(400).body(response);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

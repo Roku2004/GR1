@@ -2,10 +2,16 @@ import Login from '@/views/login.vue'; // Đổi tên file nếu cần
 import Home from '@/views/home.vue'; // Đổi tên file nếu cần
 
 import ptHome from '@/views/pt/ptHome.vue';
+import ptClass from '@/views/pt/ptClass.vue';
+import ptInfo from '@/views/pt/ptInfo.vue';
 
 //router cho customer
 import customerHome from '@/views/customer/customerHome.vue';
 import infocustomer from '@/views/customer/infocustomer.vue';
+import customerClass from '@/views/customer/customerClass.vue';
+import customerMemReg from '@/views/customer/customerMemReg.vue';
+import customerReview from '@/views/customer/customerReview.vue';
+import customerPayment from '@/views/customer/customerPayment.vue';
 
 // router cho manager
 import managerHome from '@/views/manager/managerHome.vue';
@@ -23,9 +29,15 @@ const routes = [
   { path: '/login', component: Login },
 
   { path: '/ptHome', component: ptHome },
+  { path: '/ptclass', component: ptClass },
+  { path: '/infopt', component: ptInfo },
 
   { path: '/customerHome', component: customerHome },
   { path: '/infocustomer', component: infocustomer },
+  { path: '/class', component: customerClass },
+  { path: '/extendss', component: customerMemReg },
+  { path: '/reviewss', component: customerReview },
+  { path: '/payments', component: customerPayment },
 
 
   { path: '/managerHome', component: managerHome },

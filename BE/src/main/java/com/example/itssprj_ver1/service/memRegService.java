@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,36 +33,29 @@ public class memRegService implements memRegServiceI {
     private membershipRepository membershipRepository;
 
     @Override
-    public boolean addMemberReg(String cufirstname, String culastname, String namepackage, String status, Date beginAt, Date endAt) {
+    public boolean addMemberReg(String phone, String namepackage, String status, Date beginAt, Date endAt) {
         try {
-            // Find customer by firstname and lastname
-            customer customer = customerRepository.findByFirstnameAndLastname(cufirstname, culastname);
+            customer customer = customerRepository.findByPhone(phone);
             if (customer == null) {
-                return false; // Customer not found
+                return false;
             }
-
-            // Find membership by name
             membership membership = membershipRepository.findByName(namepackage);
             if (membership == null) {
-                return false; // Membership package not found
+                return false;
             }
-
-            // Create new memberRegister using builder pattern
             memberRegister newMemberReg = memberRegister.builder()
                     .customer(customer)
                     .membership(membership)
-                    .createAt(new Date(System.currentTimeMillis())) // Current date
+                    .createAt(new Date(System.currentTimeMillis()))
                     .status(status)
                     .beginAt(beginAt)
                     .endAt(endAt)
                     .build();
-
-            // Save to database
             memRegRepository.save(newMemberReg);
 
             return true;
         } catch (Exception e) {
-            e.printStackTrace(); // Log error for debugging
+            e.printStackTrace();
             return false;
         }
     }
@@ -70,7 +65,7 @@ public class memRegService implements memRegServiceI {
         try {
             memberRegister existingMemberReg = memRegRepository.findById(memberRegId).orElse(null);
             if (existingMemberReg == null) {
-                return false; // Member register not found
+                return false;
             }
 
             // Update fields
@@ -83,36 +78,45 @@ public class memRegService implements memRegServiceI {
 
             return true;
         } catch (Exception e) {
-            e.printStackTrace(); // Log error for debugging
+            e.printStackTrace();
             return false;
         }
     }
 
     @Override
+    public boolean deleteMemberReg(int memberRegId, String status) {
+        memberRegister existingMemberReg = memRegRepository.findById(memberRegId).orElse(null);
+        if (existingMemberReg == null) {
+            return false;
+        }
+        existingMemberReg.setStatus(status);
+        memRegRepository.save(existingMemberReg);
+        return true;
+    }
+
+    @Override
     public List<Map<String, Object>> getMemberRegByStatus(String status) {
         try {
-            // Get member registrations by status
             List<memberRegister> memberRegs = memRegRepository.findByStatus(status);
-            
-            // Convert to list of maps with specific values
+
             List<Map<String, Object>> result = new ArrayList<>();
-            
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             for (memberRegister memReg : memberRegs) {
                 Map<String, Object> regInfo = new HashMap<>();
                 regInfo.put("id", memReg.getId());
-                regInfo.put("customerName", memReg.getCustomer().getFirstname() + memReg.getCustomer().getLastname());
+                regInfo.put("customerName", memReg.getCustomer().getFirstname() + " " + memReg.getCustomer().getLastname());
                 regInfo.put("membershipName", memReg.getMembership().getName());
                 regInfo.put("status", memReg.getStatus());
-                regInfo.put("createAt", memReg.getCreateAt());
-                regInfo.put("beginAt", memReg.getBeginAt());
-                regInfo.put("endAt", memReg.getEndAt());
+                regInfo.put("createAt", memReg.getCreateAt().toLocalDate().format(formatter));
+                regInfo.put("beginAt", memReg.getBeginAt().toLocalDate().format(formatter));
+                regInfo.put("endAt", memReg.getEndAt().toLocalDate().format(formatter));
                 
                 result.add(regInfo);
             }
             
             return result;
         } catch (Exception e) {
-            e.printStackTrace(); // Log error for debugging
+            e.printStackTrace();
             return null;
         }
     }
@@ -121,25 +125,25 @@ public class memRegService implements memRegServiceI {
     public List<Map<String, Object>> getMemberRegByCreateAt(Date createAt) {
         try {
             List<memberRegister> memberRegs = memRegRepository.findByCreateAt(createAt);
-            // Convert to list of maps with specific values
-            List<Map<String, Object>> result = new ArrayList<>();
 
+            List<Map<String, Object>> result = new ArrayList<>();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             for (memberRegister memReg : memberRegs) {
                 Map<String, Object> regInfo = new HashMap<>();
                 regInfo.put("id", memReg.getId());
-                regInfo.put("customerName", memReg.getCustomer().getFirstname() + memReg.getCustomer().getLastname());
+                regInfo.put("customerName", memReg.getCustomer().getFirstname() + " " + memReg.getCustomer().getLastname());
                 regInfo.put("membershipName", memReg.getMembership().getName());
                 regInfo.put("status", memReg.getStatus());
-                regInfo.put("createAt", memReg.getCreateAt());
-                regInfo.put("beginAt", memReg.getBeginAt());
-                regInfo.put("endAt", memReg.getEndAt());
+                regInfo.put("createAt", memReg.getCreateAt().toLocalDate().format(formatter));
+                regInfo.put("beginAt", memReg.getBeginAt().toLocalDate().format(formatter));
+                regInfo.put("endAt", memReg.getEndAt().toLocalDate().format(formatter));
 
                 result.add(regInfo);
             }
 
             return result;
         } catch (Exception e) {
-            e.printStackTrace(); // Log error for debugging
+            e.printStackTrace();
             return null;
         }
     }
@@ -149,42 +153,56 @@ public class memRegService implements memRegServiceI {
         try {
             List<memberRegister> allMemberRegs = memRegRepository.findAll();
             List<Map<String, Object>> memberRegisters = new ArrayList<>();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             if (allMemberRegs != null) {
                 memberRegisters = allMemberRegs.stream().map(memReg -> {
                     Map<String, Object> result = new HashMap<>();
                     result.put("id", memReg.getId());
-                    result.put("customerName", memReg.getCustomer().getFirstname() + memReg.getCustomer().getLastname());
+                    result.put("customerName", memReg.getCustomer().getFirstname() + " " + memReg.getCustomer().getLastname());
                     result.put("membershipName", memReg.getMembership().getName());
-                    result.put("status", memReg.getStatus());
-                    result.put("createAt", memReg.getCreateAt());
-                    result.put("beginAt", memReg.getBeginAt());
-                    result.put("endAt", memReg.getEndAt());
+                    Date endDate = memReg.getEndAt();
+                    Date currentTime = new Date(System.currentTimeMillis());
+                    if (endDate.after(currentTime) ) {
+                        result.put("status", memReg.getStatus());
+                    } else {
+                        result.put("status", "Hết hạn");
+                    }
+                    result.put("createAt", memReg.getCreateAt().toLocalDate().format(formatter));
+                    result.put("beginAt", memReg.getBeginAt().toLocalDate().format(formatter));
+                    result.put("endAt", memReg.getEndAt().toLocalDate().format(formatter));
                     return result;
                 }).collect(Collectors.toList());
             }
             return memberRegisters;
         } catch (Exception e) {
-            e.printStackTrace(); // Log error for debugging
+            e.printStackTrace();
             return null;
         }
     }
 
     @Override
     public List<Map<String, Object>> getAllMemberRegByCustomer(int customerId) {
-        List<memberRegister> allMemberRegs = memRegRepository.findAllByCustomer_Id(customerId);
+        List<memberRegister> allMemberRegs = memRegRepository.findAllByCustomer_Userid_Id(customerId);
         if(allMemberRegs == null || allMemberRegs.isEmpty()) {
             return null;
         }
         List<Map<String, Object>> mapList = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         for(memberRegister memReg : allMemberRegs) {
             Map<String, Object> map = new HashMap<>();
             map.put("id", memReg.getId());
             map.put("customerName", memReg.getCustomer().getFirstname() + " " + memReg.getCustomer().getLastname());
             map.put("membershipName", memReg.getMembership().getName());
-            map.put("status", memReg.getStatus());
-            map.put("createAt", memReg.getCreateAt());
-            map.put("beginAt", memReg.getBeginAt());
-            map.put("endAt", memReg.getEndAt());
+            Date endDate = memReg.getEndAt();
+            Date currentTime = new Date(System.currentTimeMillis());
+            if (endDate.after(currentTime) ) {
+                map.put("status", memReg.getStatus());
+            } else {
+                map.put("status", "Hết hạn");
+            }
+            map.put("createAt", memReg.getCreateAt().toLocalDate().format(formatter));
+            map.put("beginAt", memReg.getBeginAt().toLocalDate().format(formatter));
+            map.put("endAt", memReg.getEndAt().toLocalDate().format(formatter));
             mapList.add(map);
         }
         return mapList;
@@ -194,25 +212,25 @@ public class memRegService implements memRegServiceI {
     public List<Map<String, Object>> getMemberRegByStatusAndCreateAt(String status, Date createAt) {
         try {
             List<memberRegister> memberRegs = memRegRepository.findByStatusAndCreateAt(status, createAt);
-            // Convert to list of maps with specific values
-            List<Map<String, Object>> result = new ArrayList<>();
 
+            List<Map<String, Object>> result = new ArrayList<>();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             for (memberRegister memReg : memberRegs) {
                 Map<String, Object> regInfo = new HashMap<>();
                 regInfo.put("id", memReg.getId());
-                regInfo.put("customerName", memReg.getCustomer().getFirstname() + memReg.getCustomer().getLastname());
+                regInfo.put("customerName", memReg.getCustomer().getFirstname() + " " + memReg.getCustomer().getLastname());
                 regInfo.put("membershipName", memReg.getMembership().getName());
                 regInfo.put("status", memReg.getStatus());
-                regInfo.put("createAt", memReg.getCreateAt());
-                regInfo.put("beginAt", memReg.getBeginAt());
-                regInfo.put("endAt", memReg.getEndAt());
+                regInfo.put("createAt", memReg.getCreateAt().toLocalDate().format(formatter));
+                regInfo.put("beginAt", memReg.getBeginAt().toLocalDate().format(formatter));
+                regInfo.put("endAt", memReg.getEndAt().toLocalDate().format(formatter));
 
                 result.add(regInfo);
             }
 
             return result;
         } catch (Exception e) {
-            e.printStackTrace(); // Log error for debugging
+            e.printStackTrace();
             return null;
         }
     }

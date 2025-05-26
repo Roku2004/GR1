@@ -48,7 +48,7 @@ const scrollToPrice = () => {
     <!-- Hero Section -->
     <section class="hero">
       <div class="hero-content">
-        <h1>Biến đổi cơ thể, nâng tầm cuộc sống</h1>
+        <h1>Thay đổi cơ thể, nâng tầm cuộc sống</h1>
         <p>Tham gia PIG GYM ngay hôm nay để chinh phục mục tiêu sức khỏe của bạn!</p>
       </div>
     </section>

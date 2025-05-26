@@ -1,8 +1,10 @@
 package com.example.itssprj_ver1.service;
 
 import com.example.itssprj_ver1.model.customer;
+import com.example.itssprj_ver1.model.staff;
 import com.example.itssprj_ver1.model.users;
 import com.example.itssprj_ver1.repository.customerRepository;
+import com.example.itssprj_ver1.repository.staffRepository;
 import com.example.itssprj_ver1.repository.userRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +22,9 @@ public class customerService implements customerServiceI {
 
     @Override
     public boolean addCustomer(String firstname, String lastname, String email, String phone, String gender, int age, int userid) {
-        Optional<users> users = userRepository.findById(userid);
+        users users = userRepository.findById(userid);
 
-        if (users.isEmpty()) {
+        if (users == null) {
             return false;
         }
         customer customer = new customer();
@@ -32,7 +34,7 @@ public class customerService implements customerServiceI {
         customer.setEmail(email);
         customer.setGender(gender);
         customer.setPhone(phone);
-        customer.setUserid(users.get());
+        customer.setUserid(users);
         try {
             customerRepository.save(customer);
             return true;
@@ -86,19 +88,9 @@ public class customerService implements customerServiceI {
     }
 
     @Override
-    public List<Map<String, Object>> infoCustomer(int customerid) {
-        customer customer = customerRepository.findById(customerid);
-        Map<String, Object> response = new HashMap<>();
-        if (customer == null) {
-            return null;
-        }
-        response.put("name" , customer.getFirstname() + " " + customer.getLastname());
-        response.put("phone" , customer.getPhone());
-        response.put("email" , customer.getEmail());
-        response.put("age" , customer.getAge());
-        response.put("gender" , customer.getGender());
-        List<Map<String, Object>> mappedResults = new ArrayList<>();
-        mappedResults.add(response);
-        return mappedResults;
+    public customer infoCustomer(int customerid) {
+        customer customer = customerRepository.findByUserid_Id(customerid);
+        return customer;
     }
+
 }

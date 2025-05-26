@@ -1,85 +1,76 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import SlidebarCustomer from '@/components/SlidebarCustomer.vue';
+import SlidebarPT from '@/components/SlidebarPT.vue';
 
-const activeMenu = ref('infocustomer');
+const activeMenu = ref('infopt')
 const isLoading = ref(false);
 const message = ref('');
 const messageType = ref('');
-
 const token = localStorage.getItem('token');
 const userid = localStorage.getItem('userid');
-
-// Dữ liệu khách hàng
-const customerData = ref({
-  customerId: '',
-  name: '',
-  email: '',
-  phone: '',
-  age: '',
-  gender: '',
-  avatar: null
+const API_BASE_URL = 'http://localhost:3001/pt';
+const infoData = ref ({
+    ptId: '',
+    name: '',
+    phone: '',
+    email: '',
+    age: '',
+    gender: '',
+    rank: '',
+    avatar: null
 });
 
-// Hiển thị thông báo
-const showMessage = (text, type = 'success') => {
-  message.value = text;
-  messageType.value = type;
+const showMessenger = (text , type = 'success') => {
+    message.value = text;
+    messageType.value = type;
 
-  // Tự động ẩn sau 5 giây
-  setTimeout(() => {
-    message.value = '';
-  }, 5000);
-};
+    setTimeout(() =>{
+        message.value = '';
+    }, 5000);
+}
 
-// Xử lý lỗi API
 const handleApiError = (error, defaultMessage) => {
-  console.error(defaultMessage, error);
-  const errorMessage = error.response?.data?.message || error.message || 'Đã xảy ra lỗi không xác định';
-  showMessage(`${defaultMessage}: ${errorMessage}`, 'error');
+    console.error(defaultMessage, error);
+    const errorMessage = error.response?.data?.message || error.message || 'Đã xảy ra lỗi không xác định';
+    showMessenger(`${defaultMessage}: ${errorMessage}`, 'error');
 };
 
-// Lấy dữ liệu khách hàng
-const fetchCustomerData = async () => {
-  try {
-    isLoading.value = true;
-
-    if (!token) {
-      showMessage('Vui lòng đăng nhập lại', 'error');
-      return;
+const fetchPtData = async () => {
+    try {
+        isLoading.value = true;
+        if(!token) {
+            showMessenger('Vui lòng đăng nhập lại', 'error');
+            return;
+        }
+        
+        const response = await axios.post(`${API_BASE_URL}/getInfoPt`,
+            { userid },
+            { headers: { token } }
+        );
+        const info = response.data;
+        if(info.status === 'success') {
+            infoData.value = {
+                name: info.name,
+                phone: info.phone,
+                email: info.email,
+                age: info.age,
+                gender: info.gender,
+                rank: info.rank,
+                ptId: info.ptId
+            };
+        } else {
+            showMessenger(data.message || 'Không có dữ liệu huấn luyện viên', 'error');
+        }
+    } catch (error) {
+        handleApiError(error, 'Lỗi khi lấy dữ liệu huấn luyện viên');
+    } finally {
+        isLoading.value = false;
     }
-    const customerResponse = await axios.post(
-      'http://localhost:3001/customer/getCustomer', 
-      { userid}, 
-      { headers: { token } }
-    );
-
-    // Xử lý dữ liệu khách hàng
-    const info = customerResponse.data;
-    if (info.status === 'success') {
-      customerData.value = {
-        customerId: info.customerId,
-        name: info.name,
-        email: info.email,
-        phone: info.phone,
-        age: info.age,
-        gender: info.gender
-      };
-    } else {
-      showMessage(info.message || 'Không thể lấy thông tin khách hàng', 'error');
-    }
-    
-  } catch (error) {
-    handleApiError(error, 'Không thể tải thông tin khách hàng');
-  } finally {
-    isLoading.value = false;
-  }
 };
 
-// Tải dữ liệu khi component được mount
 onMounted(() => {
-  fetchCustomerData();
+    fetchPtData()
 });
 
 const handleMenuClick = (menuId) => {
@@ -91,7 +82,7 @@ const handleMenuClick = (menuId) => {
 
 <template>
   <div class="app-container">
-    <SlidebarCustomer :activeMenu="activeMenu" @menuClick="handleMenuClick" />
+    <SlidebarPT :activeMenu="activeMenu" @menuClick="handleMenuClick" />
 
     <div class="main-content">
       <h1 class="page-title">Thông tin cá nhân</h1>
@@ -115,9 +106,9 @@ const handleMenuClick = (menuId) => {
             <!-- Avatar section -->
             <div class="avatar-section">
               <div class="avatar-container">
-                <img v-if="customerData.avatar" :src="customerData.avatar" alt="Avatar" class="avatar" />
+                <img v-if="infoData.avatar" :src="infoData.avatar" alt="Avatar" class="avatar" />
                 <div v-else class="avatar default-avatar">
-                  {{ customerData.name ? customerData.name.charAt(0).toUpperCase() : 'U' }}
+                  {{ infoData.name ? infoData.name.charAt(0).toUpperCase() : 'U' }}
                 </div>
               </div>
             </div>
@@ -126,28 +117,32 @@ const handleMenuClick = (menuId) => {
             <div class="info-section">
               <div class="info-view">
                 <div class="info-row">
-                  <div class="info-label">Mã khách hàng</div>
-                  <div class="info-value">{{ customerData.customerId }}</div>
+                  <div class="info-label">Mã huấn luyện viên</div>
+                  <div class="info-value">{{ infoData.ptId }}</div>
                 </div>
                 <div class="info-row">
                   <div class="info-label">Họ và tên</div>
-                  <div class="info-value">{{ customerData.name }}</div>
+                  <div class="info-value">{{ infoData.name }}</div>
                 </div>
                 <div class="info-row">
                   <div class="info-label">Email</div>
-                  <div class="info-value">{{ customerData.email }}</div>
+                  <div class="info-value">{{ infoData.email }}</div>
                 </div>
                 <div class="info-row">
                   <div class="info-label">Số điện thoại</div>
-                  <div class="info-value">{{ customerData.phone }}</div>
+                  <div class="info-value">{{ infoData.phone }}</div>
                 </div>
                 <div class="info-row">
                   <div class="info-label">Tuổi</div>
-                  <div class="info-value">{{ customerData.age }}</div>
+                  <div class="info-value">{{ infoData.age }}</div>
                 </div>
                 <div class="info-row">
                   <div class="info-label">Giới tính</div>
-                  <div class="info-value">{{ customerData.gender }}</div>
+                  <div class="info-value">{{ infoData.gender }}</div>
+                </div>
+                <div class="info-row">
+                  <div class="info-label">Cấp bậc</div>
+                  <div class="info-value">{{ infoData.rank }}</div>
                 </div>
               </div>
             </div>

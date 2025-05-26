@@ -13,4 +13,8 @@ public interface exerSessionRepository extends JpaRepository<exerciseSession, In
     List<exerciseSession> findByStaff_Userid_Role_Roleid(Integer roleId);
 
     List<exerciseSession> findByCustomer_Id(Integer customerId);
+
+    List<exerciseSession> findByCustomer_Userid_Id(Integer customerUseridId);
+
+    List<exerciseSession> findByStaff_Userid_Id(Integer staffUseridId);
 }

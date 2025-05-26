@@ -28,6 +28,5 @@ public interface roomEquipmentRepository extends JpaRepository<roomEquipment, In
     //tìm theo roomname + equipment name + status
     List<roomEquipment> findByRoom_NameAndEquipmentNameAndStatus(String roomName, String equipmentName, String status);
 
-    // Phương thức hỗ trợ cho việc cập nhật và xóa
-    roomEquipment findByRoom_IdAndEquipmentName(int roomid, String equipmentName);
+    roomEquipment findAllByRoom_NameAndEquipmentName(String roomName, String equipmentName);
 }

@@ -95,7 +95,7 @@ public class userController {
                 checkadd = customerService.addCustomer(firstname, lastname, email, phone, gender, age, user.getId());
             } else if (roleid == 3) {
                 checkadd = ptService.addPT(firstname, lastname, email, phone, gender, age, user.getId());
-            } else if (roleid == 2) {
+            } else if (roleid  == 2) {
                 checkadd = managerService.addManager(firstname, lastname, email, phone, gender, age, user.getId());
             }
 
@@ -164,13 +164,13 @@ public class userController {
             String phone = request.get("phone");
             int age = Integer.parseInt(request.get("age"));
 
-            Optional<customer> customer = customerRepository.findById(id);
-            if (customer.isEmpty()) {
+            customer customer = customerRepository.findById(id);
+            if (customer == null) {
                 response.put("status", "Người dùng không tồn tại");
                 return ResponseEntity.status(400).body(response);
             }
 
-            if(customer.get().getUserid().isDeleted() == true){
+            if(customer.getUserid().isDeleted() == true){
                 response.put("status", "Tài khoản đã bị xóa, người dùng không tồn tại");
                 return ResponseEntity.status(400).body(response);
             }else {
@@ -206,12 +206,12 @@ public class userController {
             int age = Integer.parseInt(request.get("age"));
             String rank = request.get("rank");
 
-            Optional<staff> staff = staffRepository.findById(id);
-            if (staff.isEmpty()) {
+            staff staff = staffRepository.findById(id);
+            if (staff == null) {
                 response.put("status", "Người dùng không tồn tại");
                 return ResponseEntity.status(400).body(response);
             }
-            if(staff.get().getUserid().isDeleted() == true){
+            if(staff.getUserid().isDeleted() == true){
                 response.put("status", "Tài khoản đã bị xóa, người dùng không tồn tại");
                 return ResponseEntity.status(400).body(response);
             }else {

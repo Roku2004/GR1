@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name="payment")
@@ -34,7 +35,7 @@ public class payment {
     private Boolean paid;
 
     @Column(name = "createAt",nullable = false)
-    private Date createAt;
+    private LocalDateTime createAt;
 
 
 

@@ -51,6 +51,7 @@ const fetchPTList = async () => {
 
     // Giả định: API trả về mảng PT trong response.data.list
     ptList.value = response.data.list.map(pt => ({
+      id: pt.id,
       name: pt.name,
       email: pt.email,
       phone: pt.phone,
@@ -109,6 +110,7 @@ onMounted(() => {
         <table class="pt-table">
           <thead>
             <tr>
+              <th>Mã huấn luyện viên</th>
               <th>Họ tên</th>
               <th>Email</th>
               <th>Số điện thoại</th>
@@ -117,6 +119,7 @@ onMounted(() => {
           </thead>
           <tbody>
             <tr v-for="(pt) in ptList" :key="pt.id">
+              <td>{{ pt.id }}</td>
               <td>{{ pt.name }}</td>
               <td>{{ pt.email }}</td>
               <td>{{ pt.phone }}</td>

@@ -27,15 +27,12 @@ const login = async () => {
     });
 
     if (response.data.status === 'Đăng nhập thành công') {
-      const { token, userId, role } = response.data;
-
+      const { token, userid , role } = response.data;
       // Lưu token, userId và role vào localStorage
       localStorage.setItem('token', token);
-      localStorage.setItem('userId', userId);
-      localStorage.setItem('role', role); // Lưu vai trò từ API trả về
+      localStorage.setItem('userid', userid);
+      localStorage.setItem('role', role);
 
-      // Đặt token vào header mặc định của axios
-      // Đặt token vào header mặc định của axios
       axios.defaults.headers.common['token'] = token;
 
       // Điều hướng dựa trên vai trò từ API

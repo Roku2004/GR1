@@ -16,7 +16,6 @@ const showEditModal = ref(false); // Điều khiển hiển thị modal
 // Status options
 const statusOptions = [
   { value: '', label: 'Tất cả trạng thái' },
-  { value: 'Đã đăng ký', label: 'Đã đăng ký' },
   { value: 'Gia hạn', label: 'Gia hạn' },
   { value: 'Đăng ký', label: 'Đăng ký' },
   { value: 'Hủy', label: 'Hủy' }
@@ -35,8 +34,7 @@ const formData = ref({
 });
 
 const filters = ref({
-  cufirstname: '',
-  culastname: '',
+  phone: '',
   namepackage: '',
   status: '',
   createAt: '',
@@ -56,13 +54,11 @@ const getStatusClass = (status) => {
   if (!status) return 'status-unknown';
 
   switch (status.toLowerCase()) {
-    case 'đã đăng ký':  // Đã chuyển thành chữ thường
-      return 'status-active';
-    case 'gia hạn':     // Đã chuyển thành chữ thường 
+    case 'gia hạn':      
       return 'status-expired';
-    case 'đăng ký':     // Đã chuyển thành chữ thường
+    case 'đăng ký':     
       return 'status-expiring';
-    case 'hủy':        // Đã chuyển thành chữ thường
+    case 'hủy':        
       return 'status-canceled';
     default:
       return 'status-unknown';
@@ -127,7 +123,7 @@ const fetchExtendList = async () => {
         endAt: item.endAt
       }));
     } else {
-      showMessage('Dữ liệu không hợp lệ hoặc không có dữ liệu', 'error');
+      showMessage('Không có dữ liệu', 'error');
       formData.value = [];
     }
   } catch (error) {
@@ -184,9 +180,9 @@ const fetchPackages = async () => {
 
 const submitMemRegister = async () => {
   try {
-    if (!filters.value.cufirstname || !filters.value.culastname ||
-      !filters.value.namepackage || !filters.value.status ||
-      !filters.value.beginAt || !filters.value.endAt) {
+    if (!filters.value.phone || !filters.value.namepackage || 
+        !filters.value.status || !filters.value.beginAt || 
+        !filters.value.endAt) {
       showMessage('Vui lòng điền đầy đủ thông tin thiết bị', 'error');
       return;
     }
@@ -199,12 +195,11 @@ const submitMemRegister = async () => {
     const response = await axios.post(
       `${API_BASE_URL}/addMemberRegister`,
       {
-        cufirstname: filters.value.cufirstname,
-        culastname: filters.value.culastname,
+        phone: filters.value.phone,
         namepackage: filters.value.namepackage,
         status: filters.value.status,
-        beginAt: filters.value.beginAt,
-        endAt: filters.value.endAt
+        beginAt:formatDateForInput( filters.value.beginAt),
+        endAt: formatDateForInput(filters.value.endAt)
       },
       {
         headers: { token }
@@ -226,8 +221,7 @@ const submitMemRegister = async () => {
 
 const resetForm = () => {
   filters.value = {
-    cufirstname: '',
-    culastname: '',
+    phone: '',
     namepackage: '',
     status: '',
     beginAt: '',
@@ -282,7 +276,6 @@ const formatDateForInput = (dateStr) => {
 };
 
 const openEditModal = (item) => {
-  // Tạo bản sao của item để tránh thay đổi trực tiếp
   editingItem.value = {
     id: String(item.id),
     customerName: item.customerName,
@@ -302,13 +295,7 @@ const cancelEdit = () => {
 
 const updateExtend = async () => {
   try {
-    if (!editingItem.value.id || !editingItem.value.status ||
-     !editingItem.value.beginAt || !editingItem.value.endAt) {
-      showMessage('Thiếu thông tin cần thiết để cập nhật', 'error');
-      return;
-    }
-
-    isLoading.value = true;
+      isLoading.value = true;
     const token = getToken();
     if (!token) return;
 
@@ -326,7 +313,7 @@ const updateExtend = async () => {
       }
     );
 
-    if (response.data && response.data.status === "Sửa thông tin đăng ký gói tập thành công") {
+    if (response.data && (response.data.status === "Sửa thông tin đăng ký gói tập thành công" || response.data.status === "Xóa thông tin đăng ký gói tập thành công")) {
       showMessage('Sửa thông tin đăng ký gói tập thành công!', 'success');
       fetchExtendList();
 
@@ -369,14 +356,8 @@ const updateExtend = async () => {
 
         <form @submit.prevent="submitMemRegister" class="add-form">
           <div class="form-group">
-            <label for="cufirstname">Họ khách hàng</label>
-            <input type="text" id="cufirstname" v-model="filters.cufirstname" placeholder="Nhập họ khách hàng"
-              class="form-control" required />
-          </div>
-
-          <div class="form-group">
-            <label for="culastname">Tên khách hàng</label>
-            <input type="text" id="culastname" v-model="filters.culastname" placeholder="Nhập tên khách hàng"
+            <label for="phone">Số điện thoại</label>
+            <input type="text" id="phone" v-model="filters.phone" placeholder="Nhập số điện thoại khách hàng"
               class="form-control" required />
           </div>
 
@@ -456,7 +437,7 @@ const updateExtend = async () => {
         <table class="extend-table">
           <thead>
             <tr>
-              <th>Mã gia hạn</th>
+              <th>Mã đăng ký</th>
               <th>Khách hàng</th>
               <th>Gói thành viên</th>
               <th>Trạng thái</th>
@@ -856,12 +837,6 @@ const updateExtend = async () => {
   font-weight: 500;
 }
 
-/*đã đăng ký */
-.status-active {
-  background-color: #d1fae5;
-  color: #065f46;
-}
-
 /* Gia hạn */
 .status-expired {
   background-color: #dbeafe;
@@ -880,8 +855,8 @@ const updateExtend = async () => {
 }
 
 .status-unknown {
-  background-color: #e5e7eb;
-  color: #4b5563;
+  background-color: #fee2e2;
+  color: #ff5b5b;
 }
 
 /* No data message */

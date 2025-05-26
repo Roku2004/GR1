@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,8 +19,8 @@ public class managerService implements managerServiceI{
 
     @Override
     public boolean addManager(String firstname, String lastname, String email, String phone, String gender, int age, int userid) {
-        Optional<users> user = userRepository.findById(userid);
-        if (user.isEmpty()) {
+        users user = userRepository.findById(userid);
+        if (user == null) {
             return false;
         }
         staff staff = new staff();
@@ -32,7 +31,7 @@ public class managerService implements managerServiceI{
         staff.setGender(gender);
         staff.setAge(age);
         staff.setRank("Iron");
-        staff.setUserid(user.get());
+        staff.setUserid(user);
         try{
             staffRepository.save(staff);
             return true;
@@ -43,9 +42,9 @@ public class managerService implements managerServiceI{
 
     @Override
     public boolean deleteManager(int id) {
-        Optional<staff> staff = staffRepository.findById(id);
-        if (staff.isPresent()) {
-            staffRepository.delete(staff.get());
+        staff staff = staffRepository.findById(id);
+        if (staff != null) {
+            staffRepository.delete(staff);
             return true;
         }
         return false;

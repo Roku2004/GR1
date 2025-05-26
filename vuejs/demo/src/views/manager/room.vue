@@ -3,30 +3,25 @@ import Slidebar from '@/components/SlidebarManager.vue';
 import axios from 'axios';
 import { computed, onMounted, ref } from 'vue';
 
-// API base URL - centralized for easy configuration
 const API_BASE_URL = 'http://localhost:3001/manager';
 
-// Reactive states
 const activeMenu = ref('equipment');
 const roomEquipments = ref([]);
 const rooms = ref([]);
-const editingEquipment = ref(null); // Biến để theo dõi thiết bị đang được chỉnh sửa
-const deletingEquipment = ref(null); // Biến để theo dõi thiết bị đang được xóa
-const showDeleteConfirm = ref(false); // Hiển thị hộp thoại xác nhận xóa
+const editingEquipment = ref(null);
+const deletingEquipment = ref(null);
+const showDeleteConfirm = ref(false);
 
-// Handle menu click
 const handleMenuClick = (menuId) => {
   activeMenu.value = menuId;
 };
 
-// Form data thiết bị phòng tập
 const filters = ref({
   room_name: '',
   equipment_name: '',
   status: ''
 });
 
-// Form data addDevice
 const formData = ref({
   room_name: '',
   equipment_name: '',
@@ -34,20 +29,17 @@ const formData = ref({
   status: ''
 });
 
-// UI states
 const message = ref('');
 const messageType = ref('');
 const showAddForm = ref(false);
 const isLoading = ref(false);
 
-// Status options
 const statusOptions = [
   { value: 'Hoạt động', label: 'Hoạt động' },
   { value: 'Bảo trì', label: 'Bảo trì' },
   { value: 'Hỏng', label: 'Hỏng' }
 ];
 
-// lấy token từ localStorage
 const getToken = () => {
   const token = localStorage.getItem('token');
   if (!token) {
@@ -57,56 +49,45 @@ const getToken = () => {
   return token;
 };
 
-// Show notification message
 const showMessage = (text, type = 'success') => {
   message.value = text;
   messageType.value = type;
-
-  // Auto-hide message after 5 seconds
   setTimeout(() => {
     message.value = '';
   }, 5000);
 };
 
-// Handle API errors
 const handleApiError = (error, defaultMessage) => {
   console.error(defaultMessage, error);
   const errorMessage = error.response?.data?.message || error.message || 'Đã xảy ra lỗi không xác định';
   showMessage(`${defaultMessage}: ${errorMessage}`, 'error');
 };
 
-
-// Bắt đầu chỉnh sửa thiết bị
 const startEditing = (equipment) => {
-  // Tạo bản sao để chỉnh sửa
   editingEquipment.value = {
     room_name: equipment.room_name,
     equipment_name: equipment.equipment_name,
     status: equipment.status,
-    quantity: equipment.quantity, // Lưu lại để không mất thông tin
+    quantity: equipment.quantity,
   };
 };
 
-// Kiểm tra xem thiết bị có đang được chỉnh sửa không
 const isEditing = (equipment) => {
   return editingEquipment.value && 
          editingEquipment.value.room_name === equipment.room_name && 
          editingEquipment.value.equipment_name === equipment.equipment_name;
 };
 
-// Hủy chỉnh sửa
 const cancelEditing = () => {
   editingEquipment.value = null;
 };
 
-// Lưu thay đổi cho thiết bị
 const updateDevice = async () => {
   try {
     isLoading.value = true;
     const token = getToken();
     if (!token) return;
 
-    // Debug: Log what we're sending
     console.log('Updating device with data:', editingEquipment.value);
 
     const response = await axios.post(
@@ -121,11 +102,9 @@ const updateDevice = async () => {
       }
     );
 
-    // Handle successful response
     if (response.data && response.data.status === 'Cập nhật thiết bị thành công') {
       showMessage('Cập nhật trạng thái thiết bị thành công!');
       
-      // Cập nhật trạng thái trong mảng thiết bị
       const index = roomEquipments.value.findIndex(
         item => item.room_name === editingEquipment.value.room_name && 
                item.equipment_name === editingEquipment.value.equipment_name
@@ -135,13 +114,11 @@ const updateDevice = async () => {
         roomEquipments.value[index].status = editingEquipment.value.status;
       }
       
-      // Kết thúc chỉnh sửa
       editingEquipment.value = null;
     } else {
       showMessage(response.data?.message || 'Cập nhật trạng thái không thành công', 'error');
     }
   } catch (error) {
-    // Xử lý lỗi chi tiết hơn
     if (error.response && error.response.data) {
       console.error('Error response:', error.response.data);
       showMessage(`Lỗi khi cập nhật thiết bị: ${error.response.data.message || 'Đã xảy ra lỗi'}`, 'error');
@@ -153,7 +130,6 @@ const updateDevice = async () => {
   }
 };
 
-// Bắt đầu quá trình xóa thiết bị
 const startDeleting = (equipment) => {
   deletingEquipment.value = {
     room_name: equipment.room_name,
@@ -162,20 +138,17 @@ const startDeleting = (equipment) => {
   showDeleteConfirm.value = true;
 };
 
-// Hủy quá trình xóa
 const cancelDeleting = () => {
   deletingEquipment.value = null;
   showDeleteConfirm.value = false;
 };
 
-// Xác nhận và thực hiện xóa thiết bị
 const confirmDelete = async () => {
   try {
     isLoading.value = true;
     const token = getToken();
     if (!token) return;
 
-    // Debug: Log what we're deleting
     console.log('Deleting device:', deletingEquipment.value);
 
     const response = await axios.post(
@@ -189,11 +162,8 @@ const confirmDelete = async () => {
       }
     );
 
-    // Handle successful response
     if (response.data && response.data.status === 'Xóa thiết bị thành công') {
       showMessage('Xóa thiết bị thành công!');
-      
-      // Cập nhật danh sách thiết bị sau khi xóa
       fetchRoomEquipments();
     } else {
       showMessage(response.data?.message || 'Xóa thiết bị không thành công', 'error');
@@ -202,16 +172,13 @@ const confirmDelete = async () => {
     handleApiError(error, 'Lỗi khi xóa thiết bị');
   } finally {
     isLoading.value = false;
-    // Đóng dialog xác nhận
     showDeleteConfirm.value = false;
     deletingEquipment.value = null;
   }
 };
 
-// Add new device
 const submitDevice = async () => {
   try {
-    // Validate form
     if (!formData.value.room_name || !formData.value.equipment_name ||
       !formData.value.quantity || !formData.value.status) {
       showMessage('Vui lòng điền đầy đủ thông tin thiết bị', 'error');
@@ -222,7 +189,6 @@ const submitDevice = async () => {
     const token = getToken();
     if (!token) return;
 
-    // Debug: Log what we're sending
     console.log('Adding device with data:', formData.value);
 
     const response = await axios.post(
@@ -238,7 +204,6 @@ const submitDevice = async () => {
       }
     );
 
-    // Handle successful response
     if (response.data && response.data.status === 'Thêm thiết bị thành công') {
       showMessage('Thêm thiết bị thành công!');
       resetAddForm();
@@ -253,7 +218,6 @@ const submitDevice = async () => {
   }
 };
 
-// Reset addform
 const resetAddForm = () => {
   formData.value = {
     room_name: '',
@@ -264,18 +228,15 @@ const resetAddForm = () => {
   message.value = '';
 };
 
-// Chuyển đỗi giữa thêm hoặc ko thêm device
 const toggleAddForm = () => {
   showAddForm.value = !showAddForm.value;
   if (!showAddForm.value) {
     resetAddForm();
   } else {
-    // Load rooms when form is shown
     fetchRooms();
   }
 };
 
-// Fetch room equipment data
 const fetchRoomEquipments = async () => {
   try {
     isLoading.value = true;
@@ -294,7 +255,6 @@ const fetchRoomEquipments = async () => {
       }
     );
 
-    // Process response data
     if (response.data.list && Array.isArray(response.data.list)) {
       roomEquipments.value = response.data.list.map((item) => ({
         room_name: item.room_name,
@@ -314,7 +274,6 @@ const fetchRoomEquipments = async () => {
   }
 };
 
-// Fetch available rooms
 const fetchRooms = async () => {
   try {
     isLoading.value = true;
@@ -328,7 +287,6 @@ const fetchRooms = async () => {
       }
     );
 
-    // Process response data
     if (response.data.list && Array.isArray(response.data.list)) {
       rooms.value = response.data.list.map(room => ({
         room_name: room.name,
@@ -345,13 +303,11 @@ const fetchRooms = async () => {
   }
 };
 
-// Initialize data when component is mounted
 onMounted(() => {
   fetchRoomEquipments();
   fetchRooms();
 });
 
-// Clear filters
 const clearFilters = () => {
   filters.value = {
     room_name: '',
@@ -361,7 +317,6 @@ const clearFilters = () => {
   fetchRoomEquipments();
 };
 
-// Check if there are active filters
 const hasFilters = computed(() => {
   return filters.value.room_name || filters.value.equipment_name || filters.value.status;
 });
@@ -369,10 +324,8 @@ const hasFilters = computed(() => {
 
 <template>
   <div class="app-container">
-    <!-- Sidebar -->
     <Slidebar :activeMenu="activeMenu" :onMenuClick="handleMenuClick" />
 
-    <!-- Main Content -->
     <div class="main-content">
       <div class="header-actions">
         <h1 class="title">Danh sách thiết bị trong phòng</h1>
@@ -382,12 +335,10 @@ const hasFilters = computed(() => {
         </button>
       </div>
 
-      <!-- Hiển thị thông báo -->
       <div v-if="message" class="notification" :class="messageType">
         {{ message }}
       </div>
 
-      <!-- Add Device Form -->
       <div v-if="showAddForm" class="form-container">
         <h2 class="form-title">Thêm thiết bị mới</h2>
 
@@ -433,7 +384,6 @@ const hasFilters = computed(() => {
         </form>
       </div>
 
-      <!-- Search Form -->
       <div class="search-form">
         <input type="text" v-model="filters.room_name" placeholder="Tìm theo tên phòng" class="search-input" />
         <input type="text" v-model="filters.equipment_name" placeholder="Tìm theo tên thiết bị" class="search-input" />
@@ -453,13 +403,11 @@ const hasFilters = computed(() => {
         </button>
       </div>
 
-      <!-- Loading indicator -->
       <div v-if="isLoading" class="loading-indicator">
         <div class="loader"></div>
         <div>Đang tải dữ liệu...</div>
       </div>
 
-      <!-- Room Equipments Table -->
       <div class="table-container" v-else>
         <table>
           <thead>
@@ -474,16 +422,9 @@ const hasFilters = computed(() => {
           <tbody>
             <tr v-for="(equipment, index) in roomEquipments" :key="index" 
                 :class="{'editing-row': isEditing(equipment)}">
-              <!-- Tên phòng - không thay đổi -->
               <td>{{ equipment.room_name }}</td>
-
-              <!-- Tên thiết bị - không thay đổi -->
               <td>{{ equipment.equipment_name }}</td>
-
-              <!-- Số lượng - không thay đổi -->
               <td>{{ equipment.quantity }}</td>
-
-              <!-- Trạng thái - có thể chỉnh sửa -->
               <td>
                 <template v-if="isEditing(equipment)">
                   <select v-model="editingEquipment.status" class="edit-status-select">
@@ -501,7 +442,6 @@ const hasFilters = computed(() => {
                 </template>
               </td>
 
-              <!-- Thêm cột cho các nút chức năng -->
               <td class="action-column">
                 <template v-if="isEditing(equipment)">
                   <button @click="updateDevice" class="action-button save-button" :disabled="isLoading">
@@ -523,7 +463,6 @@ const hasFilters = computed(() => {
               </td>
             </tr>
 
-            <!-- Hiển thị thông báo khi không có dữ liệu -->
             <tr v-if="roomEquipments.length === 0">
               <td colspan="5" class="no-data">Không có thiết bị nào được tìm thấy</td>
             </tr>
@@ -532,7 +471,6 @@ const hasFilters = computed(() => {
       </div>
     </div>
 
-    <!-- Hộp thoại xác nhận xóa -->
     <div v-if="showDeleteConfirm" class="overlay">
       <div class="confirm-dialog">
         <h3 class="confirm-title">Xác nhận xóa</h3>
@@ -594,7 +532,6 @@ const hasFilters = computed(() => {
   background-color: #059669;
 }
 
-/* Notification styling */
 .notification {
   padding: 10px;
   border-radius: 4px;
@@ -627,7 +564,6 @@ const hasFilters = computed(() => {
   border-left: 4px solid #ef4444;
 }
 
-/* Form container */
 .form-container {
   background-color: #ffffff;
   border-radius: 8px;
@@ -735,7 +671,6 @@ const hasFilters = computed(() => {
   cursor: not-allowed;
 }
 
-/* Search form styling */
 .search-form {
   display: flex;
   gap: 10px;
@@ -781,7 +716,6 @@ const hasFilters = computed(() => {
   background-color: #e5e7eb;
 }
 
-/* Loading indicator */
 .loading-indicator {
   display: flex;
   flex-direction: column;
@@ -811,7 +745,6 @@ const hasFilters = computed(() => {
   }
 }
 
-/* Table styling */
 .table-container {
   overflow-x: auto;
   background-color: white;
@@ -831,7 +764,7 @@ thead {
 }
 
 th {
-  text-align: left;
+  text-align: center;
   padding: 12px 16px;
   font-size: 14px;
   font-weight: bold;
@@ -844,7 +777,7 @@ th {
 }
 
 td {
-  text-align: left;
+  text-align: center;
   padding: 12px 16px;
   font-size: 14px;
   color: #4b5563;
@@ -855,7 +788,6 @@ tr:hover {
   background-color: #f9fafb;
 }
 
-/* Status badges */
 .status-badge {
   display: inline-block;
   padding: 4px 8px;
@@ -879,7 +811,6 @@ tr:hover {
   color: #b91c1c;
 }
 
-/* Action buttons và chỉnh sửa trực tiếp */
 .action-column {
   white-space: nowrap;
   width: 120px;
@@ -933,7 +864,6 @@ tr:hover {
   background-color: #e5e7eb;
 }
 
-/* Nút xóa */
 .delete-button {
   background-color: #ef4444;
   color: white;
@@ -943,7 +873,6 @@ tr:hover {
   background-color: #dc2626;
 }
 
-/* Edit status dropdown */
 .edit-status-select {
   padding: 6px;
   border: 1px solid #d1d5db;
@@ -960,7 +889,6 @@ tr:hover {
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
 }
 
-/* Row being edited */
 tr.editing-row {
   background-color: #f0f9ff !important;
 }
@@ -969,7 +897,6 @@ tr.editing-row:hover {
   background-color: #e0f2fe !important;
 }
 
-/* Overlay và hộp thoại xác nhận */
 .overlay {
   position: fixed;
   top: 0;
@@ -1035,7 +962,6 @@ tr.editing-row:hover {
   cursor: not-allowed;
 }
 
-/* Responsive styling */
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0;

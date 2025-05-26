@@ -56,10 +56,8 @@ const getToken = () => {
 // Reset form
 const resetAddForm = () => {
   formData.value = {
-    cufirstname: '',
-    culastname: '',
-    ptfirstname: '',
-    ptlastname: '',
+    customerid: '',
+    ptid: '',
     exerciseType: ''
   };
   message.value = '';
@@ -95,8 +93,7 @@ const toggleUpdateForm = () => {
 const submitClass = async () => {
   try {
     // Validate form
-    if (!formData.value.cufirstname || !formData.value.culastname ||
-      !formData.value.ptfirstname || !formData.value.ptlastname ||
+    if (!formData.value.customerid || !formData.value.ptid ||
       !formData.value.exerciseType) {
       showMessage('Vui lòng điền đầy đủ thông tin buổi học', 'error');
       return;
@@ -110,13 +107,10 @@ const submitClass = async () => {
     console.log('Adding class with data:', formData.value);
 
     const response = await axios.post(
-      `${API_BASE_URL}/updateExercise`,
+      `${API_BASE_URL}/addExercise`,
       {
-        sessionid: formData.value.sessionid,
-        cufirstname: formData.value.cufirstname,
-        culastname: formData.value.culastname,
-        ptfirstname: formData.value.ptfirstname,
-        ptlastname: formData.value.ptlastname,
+        customerid: formData.value.customerid,
+        ptid: formData.value.ptid,
         exerciseType: formData.value.exerciseType
       },
       {
@@ -127,7 +121,7 @@ const submitClass = async () => {
     // Handle successful response
     if (response.data && response.data.status === 'Thêm buổi tập thành công') {
       showMessage('Thêm buổi tập thành công!');
-      resetUpdateForm();
+      resetAddForm();
       fetchClasses();
     } else {
       showMessage(response.data?.message || 'Thêm buổi tập không thành công', 'error');
@@ -271,26 +265,14 @@ onMounted(() => {
         <form @submit.prevent="submitClass" class="add-form">
 
           <div class="form-group">
-            <label for="cufirstname">Họ khách hàng</label>
-            <input type="text" id="cufirstname" v-model="formData.cufirstname" placeholder="Nhập họ khách hàng"
+            <label for="customerid">Mã khách hàng</label>
+            <input type="text" id="customerid" v-model="formData.customerid" placeholder="Nhập mã khách hàng"
               class="form-control" required />
           </div>
 
           <div class="form-group">
-            <label for="culastname">Tên khách hàng</label>
-            <input type="text" id="culastname" v-model="formData.culastname" placeholder="Nhập tên khách hàng"
-              class="form-control" required />
-          </div>
-
-          <div class="form-group">
-            <label for="ptfirstname">Họ huấn luyện viên</label>
-            <input type="text" id="ptfirstname" v-model="formData.ptfirstname" placeholder="Nhập họ huấn luyện viên"
-              class="form-control" required />
-          </div>
-
-          <div class="form-group">
-            <label for="ptlastname">Tên huấn luyện viên</label>
-            <input type="text" id="ptlastname" v-model="formData.ptlastname" placeholder="Nhập tên huấn luyện viên"
+            <label for="ptid">Mã huấn luyện viên</label>
+            <input type="text" id="ptid" v-model="formData.ptid" placeholder="Nhập mã huấn luyện viên"
               class="form-control" required />
           </div>
 
@@ -316,7 +298,7 @@ onMounted(() => {
         <form @submit.prevent="updateClass" class="update-form">
 
           <div class="form-group">
-            <label for="sessionid">Mã lớp họchọc</label>
+            <label for="sessionid">Mã lớp học</label>
             <input type="text" id="sessionid" v-model="formData.sessionid" placeholder="Nhập mã lớp học"
               class="form-control" required />
           </div>

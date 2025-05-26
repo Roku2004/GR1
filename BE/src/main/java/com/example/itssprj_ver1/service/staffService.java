@@ -16,16 +16,16 @@ public class staffService implements staffServiceI {
 
     @Override
     public boolean updateStaff(int staffid, String firstname, String lastname, String email, String phone, int age, String rank) {
-        Optional<staff> staff = staffRepository.findById(staffid);
+        staff staff = staffRepository.findById(staffid);
         if (staff != null) {
-            staff.get().setFirstname(firstname);
-            staff.get().setLastname(lastname);
-            staff.get().setEmail(email);
-            staff.get().setPhone(phone);
-            staff.get().setAge(age);
-            staff.get().setRank(rank);
+            staff.setFirstname(firstname);
+            staff.setLastname(lastname);
+            staff.setEmail(email);
+            staff.setPhone(phone);
+            staff.setAge(age);
+            staff.setRank(rank);
             try {
-                staffRepository.save(staff.get());
+                staffRepository.save(staff);
                 return true;
             } catch (Exception e) {
                 return false;

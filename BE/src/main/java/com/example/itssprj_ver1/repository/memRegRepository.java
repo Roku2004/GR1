@@ -16,5 +16,5 @@ public interface memRegRepository extends JpaRepository<memberRegister, Integer>
 
     List<memberRegister> findByStatusAndCreateAt(String status, Date createAt);
 
-    List<memberRegister> findAllByCustomer_Id(Integer customerId);
+    List<memberRegister> findAllByCustomer_Userid_Id(Integer customerId);
 }

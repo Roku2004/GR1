@@ -43,7 +43,7 @@ public class roomEquipmentService implements roomEquipmentServiceI {
         if (room == null) {
             return false;
         }
-        roomEquipment roomEquipment = (roomEquipment) roomEquipmentRepository.findByRoom_NameAndEquipmentName(room_name, equipment_name);
+        roomEquipment roomEquipment = roomEquipmentRepository.findAllByRoom_NameAndEquipmentName(room_name, equipment_name);
         roomEquipment.setStatus(status);
         roomEquipmentRepository.save(roomEquipment);
         return true;
@@ -55,7 +55,7 @@ public class roomEquipmentService implements roomEquipmentServiceI {
         if (room == null) {
             return false;
         }
-        roomEquipment roomEquipment = (roomEquipment) roomEquipmentRepository.findByRoom_NameAndEquipmentName(room_name, equipment_name);
+        roomEquipment roomEquipment = roomEquipmentRepository.findAllByRoom_NameAndEquipmentName(room_name, equipment_name);
         if (roomEquipment != null) {
             roomEquipmentRepository.delete(roomEquipment);
             return true;

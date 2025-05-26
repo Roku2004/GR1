@@ -33,7 +33,7 @@ const menuItems = ref([
   { id: 'members', text: 'Thành viên', icon: 'fas fa-users', route: '/members' },
   { id: 'ptlist' , text: 'Danh sách huấn luyện viên', icon: 'fas fa-user-tie', route: '/ptlist' },
   { id: 'classes', text: 'Lớp tập', icon: 'fas fa-dumbbell', route: '/classes' },
-  { id: 'extend', text: 'Gia hạn gói tập', icon: 'fas fa-user-tie', route: '/extend' },
+  { id: 'extend', text: 'Quản lý gói tập', icon: 'fas fa-user-tie', route: '/extend' },
   { id: 'room', text: 'Thiết bị phòng tập', icon: 'fas fa-cog', route: '/room' },
   { id: 'review', text: 'Đánh giá của khách hàng', icon: 'fas fa-cog', route: '/review' },
   { id: 'payment', text: 'Thanh toán', icon: 'fas fa-credit-card', route: '/payment' }
@@ -63,9 +63,9 @@ const menuItems = ref([
         <div class="menu-text">{{ item.text }}</div>
       </li>
     </ul>
-    <div class="sidebar-footer">
+    <div @click="goToHome" class="sidebar-footer">
       <div class="account-info">
-        <div  @click="goToHome" class="avatar-small">Đăng xuất</div>
+        <div class="avatar-small">Đăng xuất</div>
       </div>
     </div>
   </div>

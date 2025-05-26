@@ -29,12 +29,10 @@ const goToHome = () => {
 };
 
 const menuItems = ref([
-  { id: 'dashboard', text: 'Tổng quan', icon: 'fas fa-home', route: '/customerHome' },
-  { id: 'infocustomer', text: 'Thông tin cá nhân', icon: 'fas fa-users', route: '/infocustomer' },
-  { id: 'class', text: 'Lớp tập', icon: 'fas fa-dumbbell', route: '/class' },
-  { id: 'extendss', text: 'Thông tin gói tập', icon: 'fas fa-user-tie', route: '/extendss' },
-  { id: 'reviews', text: 'Đánh giá của khách hàng', icon: 'fas fa-cog', route: '/reviewss' },
-  { id: 'payments', text: 'Thông tin thanh toán', icon: 'fas fa-credit-card', route: '/payments' }
+  { id: 'dashboard', text: 'Tổng quan', icon: 'fas fa-home', route: '/ptHome' },
+  { id: 'infopt', text: 'Thông tin cá nhân', icon: 'fas fa-users', route: '/infopt' },
+  { id: 'ptclass', text: 'Lớp tập', icon: 'fas fa-dumbbell', route: '/ptclass' },
+  
 ]);
 </script>
 

@@ -12,10 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +60,7 @@ public class exerSession implements exerSessionI {
 
     @Override
     public List<Map<String, Object>> getAllSession(int customerId) {
-        List<exerciseSession> sessions = exerSessionRepository.findByCustomer_Id(customerId);
+        List<exerciseSession> sessions = exerSessionRepository.findByCustomer_Userid_Id(customerId);
         if (sessions == null || sessions.isEmpty()) {
             return null;
         }
@@ -72,10 +69,6 @@ public class exerSession implements exerSessionI {
         for ( exerciseSession session : sessions) {
             Map<String, Object> sessionMap = new HashMap<>();
             sessionMap.put("sessionid", session.getId());
-
-            // Thông tin khách hàng
-            sessionMap.put("customer_name", session.getCustomer().getFirstname() + " " +
-                    session.getCustomer().getLastname());
 
             // Thông tin huấn luyện viên
             sessionMap.put("trainer_name", session.getStaff().getFirstname() + " " +
@@ -98,15 +91,47 @@ public class exerSession implements exerSessionI {
     }
 
     @Override
-    public boolean addSession(String cufirstname, String culastname, String ptfirstname, String ptlastname,String exerciseType) {
-        customer customer = customerRepository.findByFirstnameAndLastname(cufirstname, culastname);
+    public List<Map<String, Object>> getAllSessionByPT(int ptId) {
+        List<exerciseSession> sessions = exerSessionRepository.findByStaff_Userid_Id (ptId);
+        if (sessions == null || sessions.isEmpty()) {
+            return null;
+        }
+        List<Map<String, Object>> sessionsList = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        for ( exerciseSession session : sessions) {
+            Map<String, Object> sessionMap = new HashMap<>();
+            sessionMap.put("sessionid", session.getId());
+
+            // Thông tin khách hàng
+            sessionMap.put("customer_name", session.getCustomer().getFirstname() + " " +
+                    session.getCustomer().getLastname());
+
+            // Thời gian
+            LocalDateTime beginAt = session.getBeginAt();
+            LocalDateTime endAt = session.getEndAt();
+
+            sessionMap.put("begin_time", beginAt != null ? beginAt.format(formatter) : "Chưa xác định");
+            sessionMap.put("end_time", endAt != null ? endAt.format(formatter) : "Chưa xác định");
+
+            // Loại và mô tả
+            sessionMap.put("exercise_type", session.getExerciseType());
+            sessionMap.put("description", session.getDescription() != null ? session.getDescription() : "Chưa xác định");
+
+            sessionsList.add(sessionMap);
+        }
+        return sessionsList;
+    }
+
+    @Override
+    public boolean addSession(int customerid, int ptid,String exerciseType) {
+        customer customer = customerRepository.findById(customerid);
         if (customer == null) {
-            return false; // Không tìm thấy khách hàng
+            return false;
         }
 
-        staff staff = staffRepository.findByFirstnameAndLastname(ptfirstname, ptlastname);
+        staff staff = staffRepository.findById(ptid);
         if (staff == null) {
-            return false; // Không tìm thấy huấn luyện viên
+            return false;
         }
         if(customer.getUserid().isDeleted() == true && staff.getUserid().isDeleted() == true){
             return false;
@@ -153,6 +178,25 @@ public class exerSession implements exerSessionI {
             // Lưu buổi tập vào database
             exerSessionRepository.save(session);
 
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean updateSessionPT(int sessionid, LocalDateTime beginAt, LocalDateTime endAt, String description) {
+        exerciseSession session = exerSessionRepository.findById(sessionid).orElse(null);
+        if (session == null) {
+            return false;
+        }
+        try {
+            session.setBeginAt(beginAt);
+            session.setEndAt(endAt);
+            session.setDescription(description);
+
+            exerSessionRepository.save(session);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
