@@ -1,11 +1,7 @@
 package com.example.itssprj_ver1.service;
 
-import com.example.itssprj_ver1.model.customer;
-import com.example.itssprj_ver1.model.staff;
-import com.example.itssprj_ver1.model.users;
-import com.example.itssprj_ver1.repository.customerRepository;
-import com.example.itssprj_ver1.repository.staffRepository;
-import com.example.itssprj_ver1.repository.userRepository;
+import com.example.itssprj_ver1.model.*;
+import com.example.itssprj_ver1.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +15,10 @@ public class customerService implements customerServiceI {
     private userRepository userRepository;
     @Autowired
     private customerRepository customerRepository;
+    @Autowired
+    private memRegRepository memRegRepository;
+    @Autowired
+    private exerSessionRepository exerSessionRepository;
 
     @Override
     public boolean addCustomer(String firstname, String lastname, String email, String phone, String gender, int age, int userid) {
@@ -93,4 +93,47 @@ public class customerService implements customerServiceI {
         return customer;
     }
 
+    @Override
+    public List<Map<String, Object>> getCustomerByPT(int ptid) {
+        List<exerciseSession> sessions = exerSessionRepository.findByStaff_Userid_Id(ptid);
+        List<memberRegister> memberRegisters = memRegRepository.findAll();
+
+        if (sessions == null || sessions.isEmpty()) {
+            if (memberRegisters == null || memberRegisters.isEmpty()) {
+                return null;
+            }
+        }
+
+        Set<Integer> customerIds = new HashSet<>();
+
+        if (sessions != null) {
+            for (exerciseSession session : sessions) {
+                customerIds.add(session.getCustomer().getUserid().getId());
+            }
+        }
+
+        if (memberRegisters != null) {
+            for (memberRegister memberRegister : memberRegisters) {
+                if (memberRegister.getStatus().equals("Gia hạn") || memberRegister.getStatus().equals("Đăng ký")) {
+                    customerIds.add(memberRegister.getCustomer().getUserid().getId());
+                }
+            }
+        }
+
+        List<Map<String, Object>> customerList = new ArrayList<>();
+        for (Integer customerId : customerIds) {
+            customer customer = customerRepository.findByUserid_Id(customerId);
+            if (customer != null && !customer.getUserid().isDeleted()) {
+                Map<String, Object> customerMap = new HashMap<>();
+                customerMap.put("customerId", customer.getId());
+                customerMap.put("customerName", customer.getFirstname() + " " + customer.getLastname());
+                customerMap.put("customerAge", customer.getAge());
+                customerMap.put("customerGender", customer.getGender());
+                customerMap.put("customerPhone", customer.getPhone());
+                customerMap.put("customerEmail", customer.getEmail());
+                customerList.add(customerMap);
+            }
+        }
+        return customerList;
+    }
 }

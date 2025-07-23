@@ -2,9 +2,11 @@ package com.example.itssprj_ver1.service;
 
 import com.example.itssprj_ver1.model.customer;
 import com.example.itssprj_ver1.model.exerciseSession;
+import com.example.itssprj_ver1.model.memberRegister;
 import com.example.itssprj_ver1.model.staff;
 import com.example.itssprj_ver1.repository.customerRepository;
 import com.example.itssprj_ver1.repository.exerSessionRepository;
+import com.example.itssprj_ver1.repository.memRegRepository;
 import com.example.itssprj_ver1.repository.staffRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,8 @@ public class exerSession implements exerSessionI {
     private customerRepository customerRepository;
     @Autowired
     private staffRepository staffRepository;
+    @Autowired
+    private memRegRepository memRegRepository;
     @Override
     public List<Map<String, Object>> getAllSessions() {
         List<exerciseSession> sessions = exerSessionRepository.findByStaff_Userid_Role_Roleid(3);
@@ -33,22 +37,22 @@ public class exerSession implements exerSessionI {
             Map<String, Object> sessionMap = new HashMap<>();
             sessionMap.put("sessionid", session.getId());
 
-            // Thông tin khách hàng
+
             sessionMap.put("customer_name", session.getCustomer().getFirstname() + " " +
                     session.getCustomer().getLastname());
 
-            // Thông tin huấn luyện viên
+
             sessionMap.put("trainer_name", session.getStaff().getFirstname() + " " +
                     session.getStaff().getLastname());
 
-            // Thời gian
+
             LocalDateTime beginAt = session.getBeginAt();
             LocalDateTime endAt = session.getEndAt();
 
             sessionMap.put("begin_time", beginAt != null ? beginAt.format(formatter) : "Chưa xác định");
             sessionMap.put("end_time", endAt != null ? endAt.format(formatter) : "Chưa xác định");
 
-            // Loại và mô tả
+
             sessionMap.put("exercise_type", session.getExerciseType());
             sessionMap.put("description", session.getDescription() != null ? session.getDescription() : "Chưa xác định");
 
@@ -70,18 +74,18 @@ public class exerSession implements exerSessionI {
             Map<String, Object> sessionMap = new HashMap<>();
             sessionMap.put("sessionid", session.getId());
 
-            // Thông tin huấn luyện viên
+
             sessionMap.put("trainer_name", session.getStaff().getFirstname() + " " +
                     session.getStaff().getLastname());
 
-            // Thời gian
+
             LocalDateTime beginAt = session.getBeginAt();
             LocalDateTime endAt = session.getEndAt();
 
             sessionMap.put("begin_time", beginAt != null ? beginAt.format(formatter) : "Chưa xác định");
             sessionMap.put("end_time", endAt != null ? endAt.format(formatter) : "Chưa xác định");
 
-            // Loại và mô tả
+
             sessionMap.put("exercise_type", session.getExerciseType());
             sessionMap.put("description", session.getDescription() != null ? session.getDescription() : "Chưa xác định");
 
@@ -133,19 +137,19 @@ public class exerSession implements exerSessionI {
         if (staff == null) {
             return false;
         }
-        if(customer.getUserid().isDeleted() == true && staff.getUserid().isDeleted() == true){
+
+        memberRegister memberRegister = memRegRepository.findByCustomer_Userid_Id(customerid);
+        if(customer.getUserid().isDeleted() == true && staff.getUserid().isDeleted() == true && (!memberRegister.getStatus().equals("Gia hạn") || !memberRegister.getStatus().equals("Đăng ký"))){
             return false;
         } else {
             try {
 
-                // Tạo đối tượng exerciseSession sử dụng builder pattern
                 exerciseSession session = exerciseSession.builder()
                         .customer(customer)
                         .staff(staff)
                         .ExerciseType(exerciseType)
                         .build();
 
-                // Lưu buổi tập vào database
                 exerSessionRepository.save(session);
 
                 return true;
@@ -164,14 +168,13 @@ public class exerSession implements exerSessionI {
         }
         customer customer = customerRepository.findByFirstnameAndLastname(cufirstname, culastname);
         if (customer == null) {
-            return false; // Không tìm thấy khách hàng
+            return false;
         }
         staff staff = staffRepository.findByFirstnameAndLastname(ptfirstname, ptlastname);
         if (staff == null) {
-            return false; // Không tìm thấy huấn luyện viên
+            return false;
         }
         try {
-            // Cập nhật các thuộc tính của đối tượng hiện có
             session.setCustomer(customer);
             session.setStaff(staff);
             session.setExerciseType(exerciseType);
@@ -201,6 +204,43 @@ public class exerSession implements exerSessionI {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    @Override
+    public boolean addSessionPT(int customerid, LocalDateTime beginAt, LocalDateTime endAt, String exerciseType, String description,int staffid  ) {
+        customer customer = customerRepository.findById(customerid);
+        if (customer == null) {
+            return false;
+        }
+
+        staff staff = staffRepository.findByUserid_Id(staffid);
+        if (staff == null) {
+            return false;
+        }
+
+        memberRegister memberRegisters = memRegRepository.findByCustomer_Userid_Id(customerid);
+
+        if(customer.getUserid().isDeleted() == true && staff.getUserid().isDeleted() == true && (!memberRegisters.getStatus().equals("Gia hạn") || !memberRegisters.getStatus().equals("Đăng ký"))){
+            return false;
+        } else {
+            try {
+                exerciseSession session = exerciseSession.builder()
+                        .customer(customer)
+                        .staff(staff)
+                        .beginAt(beginAt)
+                        .endAt(endAt)
+                        .ExerciseType(exerciseType)
+                        .description(description)
+                        .build();
+
+                exerSessionRepository.save(session);
+
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
         }
     }
 }

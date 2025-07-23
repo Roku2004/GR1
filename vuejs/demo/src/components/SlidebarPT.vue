@@ -32,6 +32,7 @@ const menuItems = ref([
   { id: 'dashboard', text: 'Tổng quan', icon: 'fas fa-home', route: '/ptHome' },
   { id: 'infopt', text: 'Thông tin cá nhân', icon: 'fas fa-users', route: '/infopt' },
   { id: 'ptclass', text: 'Lớp tập', icon: 'fas fa-dumbbell', route: '/ptclass' },
+  { id: 'ptcustomer' ,text: 'Danh sách khách hàng', icon: 'fas fa-list', route: '/ptcustomer' }
   
 ]);
 </script>

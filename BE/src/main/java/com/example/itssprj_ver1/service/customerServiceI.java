@@ -14,4 +14,6 @@ public interface customerServiceI {
     boolean updateCustomer(int customerid, String firstname, String lastname, String email, String phone, int age);
 
     customer infoCustomer(int customerid);
+
+    List<Map<String, Object>> getCustomerByPT(int ptid);
 }

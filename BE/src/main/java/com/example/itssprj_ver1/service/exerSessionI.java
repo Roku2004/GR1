@@ -12,4 +12,5 @@ public interface exerSessionI {
     boolean addSession(int customerid, int ptid, String exerciseType);
     boolean updateSession(int sessionid,String cufirstname, String culastname, String ptfirstname, String ptlastname, String exerciseType);
     boolean updateSessionPT(int sessionid, LocalDateTime beginAt, LocalDateTime endAt, String description);
+    boolean addSessionPT(int customerid,LocalDateTime beginAt, LocalDateTime endAt, String exerciseType, String description,int staffid);
 }

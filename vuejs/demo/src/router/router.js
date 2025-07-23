@@ -1,9 +1,11 @@
 import Login from '@/views/login.vue'; // Đổi tên file nếu cần
 import Home from '@/views/home.vue'; // Đổi tên file nếu cần
 
+// router cho pt
 import ptHome from '@/views/pt/ptHome.vue';
 import ptClass from '@/views/pt/ptClass.vue';
 import ptInfo from '@/views/pt/ptInfo.vue';
+import ptCustomer from '@/views/pt/ptCustomer.vue';
 
 //router cho customer
 import customerHome from '@/views/customer/customerHome.vue';
@@ -31,6 +33,7 @@ const routes = [
   { path: '/ptHome', component: ptHome },
   { path: '/ptclass', component: ptClass },
   { path: '/infopt', component: ptInfo },
+  { path: '/ptcustomer', component: ptCustomer },
 
   { path: '/customerHome', component: customerHome },
   { path: '/infocustomer', component: infocustomer },

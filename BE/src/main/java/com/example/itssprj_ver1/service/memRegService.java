@@ -68,7 +68,6 @@ public class memRegService implements memRegServiceI {
                 return false;
             }
 
-            // Update fields
             existingMemberReg.setStatus(status);
             existingMemberReg.setBeginAt(beginAt);
             existingMemberReg.setEndAt(endAt);

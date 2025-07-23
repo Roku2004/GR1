@@ -11,6 +11,4 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class adminService implements adminServiceI {
-    @Autowired
-    private userRepository userRepository;
 }
